@@ -1,7 +1,8 @@
 const express = require("express");
 const path = require("path");
-const http = require("http");
-const socketIo = require("socket.io");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const { instrument } = require("@socket.io/admin-ui");
 const formatMessage = require("./utils/messages");
 const {
   userJoin,
@@ -11,8 +12,18 @@ const {
 } = require("./utils/users");
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true,
+  },
+});
+
+// Admin UI
+instrument(io, {
+  auth: false,
+});
 
 // Bot name
 const botName = "ChatCord Bot";
